@@ -1,20 +1,24 @@
 package com.danielserva.malda.model;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Type;
 
 import lombok.Getter;
+import lombok.Setter;
 
-
+@Getter
+@Setter
 @Entity
 public class Device {
 
@@ -28,24 +32,24 @@ public class Device {
         this.model = model;
         this.osVersion = osVersion;
         // this.detections = detections;
+
     }
     
     @Id
     @GeneratedValue
-    @Getter
     private Long id;
     
-    @Getter
+    @Type(type="org.hibernate.type.UUIDCharType")
+    @NotNull
     private UUID uuid;
-    @Getter
+    @NotNull
     private DeviceType type;
-    @Getter
+    @NotBlank(message = "Model is mandatory")
     private String model;
-    @Getter
+    @NotBlank(message = "Os version is mandatory")
     private String osVersion;
 
-    @Getter
-    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "device", cascade =  CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Detection> detections;
 
 }

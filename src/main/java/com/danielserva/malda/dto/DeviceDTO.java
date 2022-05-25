@@ -15,7 +15,7 @@ public class DeviceDTO {
     
     Long id;
     
-    UUID uuID;
+    UUID uuid;
     DeviceType type;
     String model;
     String osVersion;

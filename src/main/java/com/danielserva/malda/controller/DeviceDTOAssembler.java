@@ -15,8 +15,8 @@ public class DeviceDTOAssembler implements RepresentationModelAssembler<DeviceDT
     @Override
     public EntityModel<DeviceDTO> toModel(DeviceDTO device) {
         return EntityModel.of(device,
-        linkTo(methodOn(DeviceController.class).getByUuid(device.getUuID())).withSelfRel(),
-        linkTo(methodOn(DeviceController.class).all()).withRel("device")) ;
+        linkTo(methodOn(DeviceController.class).getByUuid(device.getUuid())).withSelfRel(),
+        linkTo(methodOn(DeviceController.class).all()).withRel("devices")) ;
     }
 
 }

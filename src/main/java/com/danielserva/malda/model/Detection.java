@@ -8,6 +8,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
@@ -38,8 +40,11 @@ public class Detection {
     private Long id;
 
     @Type(type="org.hibernate.type.UUIDCharType")
+    @NotNull
     private UUID uuid;
+    @NotNull
     private DetectionType type;
+    @NotNull
     private Timestamp time;
     private String nameOfApp;
     private String typeOfApp;
@@ -48,5 +53,9 @@ public class Detection {
     @NotNull
     private Device device;
 
+    @AssertTrue(message = "Name and Type of App are mandatory")
+    private boolean isOk(){
+        return (this.type == DetectionType.RESOLVED || this.type == DetectionType.NO_DETECTION ) || (null != this.nameOfApp && null!= this.typeOfApp) ; 
+    }
     
 }

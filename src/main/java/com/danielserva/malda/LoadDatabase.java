@@ -1,17 +1,7 @@
 package com.danielserva.malda;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import com.danielserva.malda.model.Detection;
 import com.danielserva.malda.model.DetectionRepository;
-import com.danielserva.malda.model.Device;
 import com.danielserva.malda.model.DeviceRepository;
-import com.danielserva.malda.model.DeviceType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +16,11 @@ public class LoadDatabase {
     @Bean
 	CommandLineRunner initDatabase(DeviceRepository deviceRepository, DetectionRepository detectionRepository) {
 	  return args -> {
-      Set<Detection> detectionList = new LinkedHashSet<>();
-      Set<Detection> detectionList2 = new LinkedHashSet<>();
-      
 		  log.info("Preloading ");
-      Device device =  deviceRepository.save(new Device(UUID.randomUUID(), DeviceType.ANDROID, "Asus ZenFone 5", "KitKat"));
+      // Set<Detection> detectionList = new LinkedHashSet<>();
+      // Set<Detection> detectionList2 = new LinkedHashSet<>();
+      
+      // Device device =  deviceRepository.save(new Device(UUID.randomUUID(), DeviceType.ANDROID, "Asus ZenFone 5", "KitKat"));
       // detectionList.add(new Detection(UUID.randomUUID(), new Timestamp(System.currentTimeMillis()) ,"RYUK","Ransomware"));
       // detectionList.add(new Detection(UUID.randomUUID(), new Timestamp(System.currentTimeMillis()) ,"Astaroth","Fileless Malware"));
       // detectionList.add(new Detection(UUID.randomUUID(), new Timestamp(System.currentTimeMillis()) ,"DarkHotel","Spyware"));
