@@ -26,12 +26,14 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class DetectionController {
@@ -103,7 +105,13 @@ public class DetectionController {
     @PostMapping("/detection")
     public ResponseEntity<?> create(@RequestBody DeviceDTO deviceDTO){
         Device newDevice = modelMapper.map(deviceDTO, Device.class) ;
+        try {
             deviceRepository.save(newDevice);
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+           HttpStatus.BAD_REQUEST, "Could not create detection", e);
+        }
+
         deviceDTO =  modelMapper.map(newDevice, DeviceDTO.class);
         EntityModel<DeviceDTO> entityModel = deviceDtoAssembler.toModel(deviceDTO);
         return ResponseEntity
