@@ -1,8 +1,9 @@
-package com.danielserva.malda.controller;
+package com.danielserva.malda.assembler;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import com.danielserva.malda.controller.DetectionController;
 import com.danielserva.malda.dto.DetectionDTO;
 
 import org.springframework.hateoas.EntityModel;

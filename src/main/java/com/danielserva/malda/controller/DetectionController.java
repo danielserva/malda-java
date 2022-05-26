@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.danielserva.malda.assembler.DetectionDTOAssembler;
+import com.danielserva.malda.assembler.DeviceDTOAssembler;
 import com.danielserva.malda.dto.DetectionDTO;
-import com.danielserva.malda.dto.DetectionMessageDTO;
 import com.danielserva.malda.dto.DeviceDTO;
-import com.danielserva.malda.exception.DetectionNotFoundException;
 import com.danielserva.malda.model.Detection;
 import com.danielserva.malda.model.DetectionRepository;
 import com.danielserva.malda.model.Device;
@@ -19,6 +19,8 @@ import com.danielserva.malda.model.DeviceRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.hateoas.CollectionModel;
@@ -51,8 +53,8 @@ public class DetectionController {
     }
 
     @GetMapping("/detection")
-    CollectionModel<EntityModel<DetectionDTO>> all(){
-        List<EntityModel<DetectionDTO>> detections = detectionRepository.findAll(Sort.by(Direction.ASC, "time"))
+    public CollectionModel<EntityModel<DetectionDTO>> all(){
+        List<EntityModel<DetectionDTO>> detections = detectionRepository.findAll(Sort.by(Direction.DESC, "time"))
             .stream()
             .map(d -> modelMapper.map(d, DetectionDTO.class))
             .map(detectionDtoAssembler::toModel)
@@ -60,61 +62,65 @@ public class DetectionController {
         return CollectionModel.of(detections, 
             linkTo(methodOn(DetectionController.class).all()).withSelfRel() ) ;
     }
-    
-    @GetMapping("/detection/{uuId}")
-    EntityModel<DetectionDTO> getByUuid(@PathVariable UUID uuId){
-        Detection detection = detectionRepository.findOneByUuid(uuId)
-        .orElseThrow(() -> new DetectionNotFoundException(uuId));
-        DetectionDTO detectionDto = modelMapper.map(detection, DetectionDTO.class);
-        return detectionDtoAssembler.toModel(detectionDto);
-    }
-    
-    // @GetMapping("/detection/id/{id}")
-    // EntityModel<DetectionDTO> getById(@PathVariable Long id){
-    //     Detection detection = detectionRepository.findById(id)
-    //     .orElseThrow(() -> new DetectionNotFoundException(id));
-    //     DetectionDTO detectionDto = modelMapper.map(detection, DetectionDTO.class);
-    //     return dtoAssembler.toModel(detectionDto);
-    // }
-    
-    @PostMapping("/detection")
-    ResponseEntity<?>  newDetection(@RequestBody DetectionDTO newDetectionDto){
-        Detection newDetection = modelMapper.map(newDetectionDto, Detection.class);
-        detectionRepository.save(newDetection);
-        newDetectionDto = modelMapper.map(newDetection, DetectionDTO.class);
-        EntityModel<DetectionDTO> detectionEntity = detectionDtoAssembler.toModel(newDetectionDto);
-        return ResponseEntity
-            .created(detectionEntity.getRequiredLink(IanaLinkRelations.SELF).toUri())
-            .body(detectionEntity) ;
+
+    @GetMapping("/detection/search")
+    public CollectionModel<EntityModel<DetectionDTO>> searchByExample(DetectionDTO detectionDTO){
+        Detection detection = modelMapper.map(detectionDTO, Detection.class);
+        ExampleMatcher matcher = ExampleMatcher.matching()
+        .withIgnoreCase()
+        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+        Example<Detection> example = Example.of(detection, matcher);
+
+        List<EntityModel<DetectionDTO>> detections = detectionRepository.findAll(example, Sort.by(Direction.DESC, "time"))
+            .stream()
+            .map(d -> modelMapper.map(d, DetectionDTO.class))
+            .map(detectionDtoAssembler::toModel)
+            .collect(Collectors.toList()) ;
+        return CollectionModel.of(detections, 
+            linkTo(methodOn(DetectionController.class).all()).withSelfRel() ) ;
     }
 
+    
+    @GetMapping("/detection/{uuId}")
+    public CollectionModel<EntityModel<DetectionDTO>> getByUuid(@PathVariable UUID uuId){
+        List<EntityModel<DetectionDTO>> detections = detectionRepository.findByUuid(uuId)
+            .stream()
+            .map(d -> modelMapper.map(d, DetectionDTO.class))
+            .map(detectionDtoAssembler::toModel)
+            .collect(Collectors.toList());
+        return CollectionModel.of(detections, 
+            linkTo(methodOn(DetectionController.class).getByUuid(uuId)).withSelfRel() ) ;
+    }
+    
     /** 
      * A detection message should contain the following:
      * 1- Device information 
      * 2- Detection information
      * A device can have one, several or no detections.
-     * A DeviceDTO satisfies the requirements for this message, thus
-     * we will reuse this to keep system design simple.
+     * Since a DeviceDTO satisfies the requirements for this message,
+     * we will reuse it to keep system design simple.
      * */ 
-    @PostMapping("/detectionmessage")
-    ResponseEntity<?> create(@RequestBody DeviceDTO newDeviceDto){
-        log.info("saving device");
-        Device newDevice = modelMapper.map(newDeviceDto, Device.class);
-        deviceRepository.save(newDevice);
-        newDeviceDto =  modelMapper.map(newDevice, DeviceDTO.class);
-        EntityModel<DeviceDTO> entityModel = deviceDtoAssembler.toModel(newDeviceDto);
+    @PostMapping("/detection")
+    public ResponseEntity<?> create(@RequestBody DeviceDTO deviceDTO){
+        Device newDevice = modelMapper.map(deviceDTO, Device.class) ;
+            deviceRepository.save(newDevice);
+        deviceDTO =  modelMapper.map(newDevice, DeviceDTO.class);
+        EntityModel<DeviceDTO> entityModel = deviceDtoAssembler.toModel(deviceDTO);
         return ResponseEntity
-        .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+            .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
             .body(entityModel);
     }
+
+    // @PostMapping("/detection")
+    // public ResponseEntity<?>  newDetection(@RequestBody DetectionDTO newDetectionDto){
+    //     Detection newDetection = modelMapper.map(newDetectionDto, Detection.class);
+    //     detectionRepository.save(newDetection);
+    //     newDetectionDto = modelMapper.map(newDetection, DetectionDTO.class);
+    //     EntityModel<DetectionDTO> detectionEntity = detectionDtoAssembler.toModel(newDetectionDto);
+    //     return ResponseEntity
+    //         .created(detectionEntity.getRequiredLink(IanaLinkRelations.SELF).toUri())
+    //         .body(detectionEntity) ;
+    // }
+
         
-    // @PostMapping("/detectionmessage")
-    Device newDetection(@RequestBody DetectionMessageDTO detectionMessage){
-        Device newDeviceDetection = modelMapper.map(detectionMessage.getDeviceInformation(), Device.class);
-        List<Detection> detectionList = detectionMessage.getDetectionInformation()
-                                        .stream()
-                                        .map(di -> modelMapper.map(di, Detection.class))
-                                        .collect(Collectors.toList());
-        return deviceRepository.save(newDeviceDetection);
-    }
 }

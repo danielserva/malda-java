@@ -13,8 +13,6 @@ import lombok.Setter;
 @Setter
 public class DeviceDTO {
     
-    Long id;
-    
     UUID uuid;
     DeviceType type;
     String model;

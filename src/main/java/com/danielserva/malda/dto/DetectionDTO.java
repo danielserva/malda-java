@@ -17,6 +17,7 @@ public class DetectionDTO {
     Timestamp time;
     String nameOfApp;
     String typeOfApp;
+
     @JsonBackReference
     DeviceDTO device;
 }
