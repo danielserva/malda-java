@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class HelloControllerTest {
+public class HomeControllerTest {
 
 	@Autowired
 	private MockMvc mvc;
@@ -22,6 +22,6 @@ public class HelloControllerTest {
 	public void getHello() throws Exception {
 		mvc.perform(MockMvcRequestBuilders.get("/").accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andExpect(content().string(equalTo("Hello from Malda")));
+				.andExpect(content().string(equalTo("Welcome to Malda, a simple Malware detection api written in java")));
 	}
 }
