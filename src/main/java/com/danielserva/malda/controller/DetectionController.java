@@ -7,18 +7,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.danielserva.malda.assembler.DetectionDTOAssembler;
-import com.danielserva.malda.assembler.DeviceDTOAssembler;
-import com.danielserva.malda.dto.DetectionDTO;
-import com.danielserva.malda.dto.DeviceDTO;
-import com.danielserva.malda.model.Detection;
-import com.danielserva.malda.model.DetectionRepository;
-import com.danielserva.malda.model.Device;
-import com.danielserva.malda.model.DeviceRepository;
-
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
@@ -35,10 +24,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.danielserva.malda.assembler.DetectionDTOAssembler;
+import com.danielserva.malda.assembler.DeviceDTOAssembler;
+import com.danielserva.malda.dto.DetectionDTO;
+import com.danielserva.malda.dto.DeviceDTO;
+import com.danielserva.malda.model.Detection;
+import com.danielserva.malda.model.DetectionRepository;
+import com.danielserva.malda.model.Device;
+import com.danielserva.malda.model.DeviceRepository;
+
 @RestController
 public class DetectionController {
 
-    private static final Logger log = LoggerFactory.getLogger(DetectionController.class);
+    
     private final DetectionRepository detectionRepository;
     private final DeviceRepository deviceRepository;
     
@@ -118,17 +116,6 @@ public class DetectionController {
             .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
             .body(entityModel);
     }
-
-    // @PostMapping("/detection")
-    // public ResponseEntity<?>  newDetection(@RequestBody DetectionDTO newDetectionDto){
-    //     Detection newDetection = modelMapper.map(newDetectionDto, Detection.class);
-    //     detectionRepository.save(newDetection);
-    //     newDetectionDto = modelMapper.map(newDetection, DetectionDTO.class);
-    //     EntityModel<DetectionDTO> detectionEntity = detectionDtoAssembler.toModel(newDetectionDto);
-    //     return ResponseEntity
-    //         .created(detectionEntity.getRequiredLink(IanaLinkRelations.SELF).toUri())
-    //         .body(detectionEntity) ;
-    // }
 
         
 }
